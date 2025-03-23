@@ -1,10 +1,14 @@
-import React from 'react';
+import React, { use } from 'react';
 import { useState } from 'react';
 import { toast } from 'react-toastify';
+import { userLogin } from '../../apiUtils/usrApi';
+import { useNavigate } from 'react-router-dom';
 
 const LoginPage = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+
+    const navigate = useNavigate();
 
     const isValid = () => {
         if (email && password && email.trim().length > 0 && password.trim().length > 0) {
@@ -18,12 +22,25 @@ const LoginPage = () => {
         }
     }
 
-    const handleSubmit = (e) => {
-        e.preventDefault();
+
+    const handleSubmit = async (event) => {
+        event.preventDefault();
         email.trim();
         password.trim();
         if (isValid()) {
-            console.log(email, password);
+            //console.log("email:", email, "password:", password);
+            const response = await userLogin({ email: email, password: password });
+            console.log("response from UserLogin api:", response);
+            if (response?.success) {
+                localStorage.setItem('@token', JSON.stringify(response?.token));
+                localStorage.setItem('@user', JSON.stringify(response?.data));
+                navigate('/');
+
+            } else {
+                //alert(response?.message);
+                toast(response?.message);
+            }
+
         } else {
             //alert('Please enter email and password');
             toast('Please enter email and password');
