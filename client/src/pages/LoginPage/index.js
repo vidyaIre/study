@@ -1,14 +1,30 @@
-import React, { use } from 'react';
+import React from 'react';
 import { useState } from 'react';
 import { toast } from 'react-toastify';
 import { userLogin } from '../../apiUtils/usrApi';
 import { useNavigate } from 'react-router-dom';
+import { useEffect } from 'react';
 
 const LoginPage = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
 
     const navigate = useNavigate();
+
+    useEffect(() => {
+        const token = localStorage.getItem('@token');
+        const user = localStorage.getItem('@user');
+        if ( token && user) {
+            navigate('/');
+            return;
+        } else {
+            localStorage.removeItem('@token');
+            localStorage.removeItem('@user');
+            toast.info('session expired, please login again');
+            navigate('/pages/LoginPage');
+        }
+        
+    }, []);
 
     const isValid = () => {
         if (email && password && email.trim().length > 0 && password.trim().length > 0) {
