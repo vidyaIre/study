@@ -15,5 +15,10 @@ export const userLogin = async (payload) => {
             message: "Please enter email and password"
         }
     }
+}
 
+export const getUser = async () => {
+    const result = await axiosInstance.get("/getUser").catch((error) => console.log("error is:", error));
+    //console.log(result);
+    return result?.data;
 }

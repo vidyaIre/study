@@ -1,5 +1,5 @@
 import './App.css';
-import { Route, BrowserRouter as Router, Routes } from 'react-router-dom';
+import { BrowserRouter as Router, RouterProvider, Routes } from 'react-router-dom';
 import { useState } from 'react';
 import productsData from './Data/products.json';
 import Header from './components/Header';
@@ -9,6 +9,8 @@ import ProductDetails from './components/ProductDetails';
 import HomePage from './pages/HomePage';
 import LoginPage from './pages/LoginPage';
 import { ToastContainer,Zoom } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import routes  from './routes';
 
 
 
@@ -55,10 +57,11 @@ function App() {
             {/* <Route path="/" element={<ProductList products={filteredProducts} addToCart={addToCart} />} />
         <Route path="/cart" element={<Cart cartItems={cart} />} />
         <Route path="/product/:id" element={<ProductDetails addToCart={addToCart} />} /> */}
-            <Route path="/" element={<HomePage />} />
-            <Route path="/login" element={<LoginPage />} />
+            {/* <Route path="/" element={<HomePage />} />
+            <Route path="/login" element={<LoginPage />} /> */}
           </Routes>
         </Router>
+        <RouterProvider router={routes} />
         <ToastContainer
           position="top-right"
           autoClose={5000}

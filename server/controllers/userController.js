@@ -25,10 +25,10 @@ module.exports = {
                         console.log("response is:", response);
 
                         return res.status(201).json({
-                                success: true,
-                                statusCode: 201,
-                                Message: "User added successfully",
-                                data: response
+                            success: true,
+                            statusCode: 201,
+                            Message: "User added successfully",
+                            data: response
                         })
 
                     }).catch((error) => {
@@ -68,60 +68,82 @@ module.exports = {
     },
     userLogin: async (req, res) => {
         try {
-           const { email, password } = req.body;
-           //console.log("Login request came")
-           if (email && password) {
-              const userFound = await userModel.findOne({ email: email }).lean();
-  
-              if (userFound) {
-                 const ispasswordMatch =  await bcrypt.compare(password, userFound.password);
-                 //console.log(ispasswordMatch);
-  
-                 if (ispasswordMatch) {
-                    delete userFound.password;
-  
-                    const jwtSecretKey = process.env.JWT_SECRET_KEY;
-                    const token = jwt.sign(
-                       { userId: userFound?._id },
-                       jwtSecretKey,
-                       { expiresIn: "5d" }
-                    )
-  
-                    return res.status(200).json({
-                       success: true,
-                       statusCode: 200,
-                       message: "User login successfully",
-                       token: token,
-                       data: userFound
-                    })
-                 } else {
+            const { email, password } = req.body;
+            //console.log("Login request came")
+            if (email && password) {
+                const userFound = await userModel.findOne({ email: email }).lean();
+
+                if (userFound) {
+                    const ispasswordMatch = await bcrypt.compare(password, userFound.password);
+                    //console.log(ispasswordMatch);
+
+                    if (ispasswordMatch) {
+                        delete userFound.password;
+
+                        const jwtSecretKey = process.env.JWT_SECRET_KEY;
+                        const token = jwt.sign(
+                            { userId: userFound?._id },
+                            jwtSecretKey,
+                            { expiresIn: "5d" }
+                        )
+
+                        return res.status(200).json({
+                            success: true,
+                            statusCode: 200,
+                            message: "User login successfully",
+                            token: token,
+                            data: userFound
+                        })
+                    } else {
+                        res.status(200).json({
+                            success: false,
+                            statusCode: 200,
+                            message: "Incorrect password"
+                        })
+                    }
+                } else {
                     res.status(200).json({
-                       success: false,
-                       statusCode: 200,
-                       message: "Incorrect password"
+                        success: false,
+                        statusCode: 200,
+                        message: " User doesnot exists"
                     })
-                 }
-              } else {
-                 res.status(200).json({
+                }
+            } else {
+                res.status(200).json({
                     success: false,
                     statusCode: 200,
-                    message: " User doesnot exists"
-                 })
-              }
-           } else {
-              res.status(200).json({
-                 success: false,
-                 statusCode: 200,
-                 message: "Missing required fields"
-              })
-           }
+                    message: "Missing required fields"
+                })
+            }
         } catch (error) {
-           console.log("error is:", error);
-           res.status(500).json({
-              success: false,
-              statusCode: 500,
-              message: error.message
-           });
+            console.log("error is:", error);
+            res.status(500).json({
+                success: false,
+                statusCode: 500,
+                message: error.message
+            });
         }
-     }  
+    },
+    getUser: async (req, res) => {
+        try {
+            //console.log(req.userId);
+            const users = await userModel.find({ isDeleted: false }).lean();
+
+            return res.status(200).json({
+                success: true,
+                statusCode: 200,
+                count: users.length,
+                message: "users fetched successfully",
+                data: users
+            });
+        } catch (error) {
+            console.log("error is:", error);
+
+            res.status(500).json({
+                success: false,
+                statusCode: 500,
+                message: "Internal Server Error"
+            });
+        }
+    }
 }
